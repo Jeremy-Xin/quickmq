@@ -166,21 +166,8 @@ func handler(ctx *fasthttp.RequestCtx) {
 func main() {
 	runtime.GOMAXPROCS(*cpu)
 
-	go func(namechan chan string, ptrchan chan string) {
-		for {
-			queueName := <-namechan
-			putpos := readQueuePutPtr(queueName)
-			ptrchan <- putpos
-		}
-	}(putnamechan, putptrchan)
-
-	go func(namechan chan string, ptrchan chan string) {
-		for {
-			quequeName := <-namechan
-			getpos := readQueueGetPtr(quequeName)
-			ptrchan <- getpos
-		}
-	}(getnamechan, getptrchan)
+	RunPutChan(putnamechan, putptrchan)
+	RunGetChan(getnamechan, getptrchan)
 
 	fmt.Printf("Quickmq is running on %s", *ip+":"+*port)
 	fasthttp.ListenAndServe(*ip+":"+*port, handler)
